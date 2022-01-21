@@ -1,5 +1,8 @@
 {
   "name": "hardhat-project",
+  "scripts": {
+    "generateTypes": "typechain --target=web3-v1  --out-dir ../app/src/typechain ./artifacts/contracts/assetSide.sol/AssetSide.json && copyfiles --flat -V ./artifacts/contracts/assetSide.sol/AssetSide.json ../app/src/typechain && typechain --target=web3-v1  --out-dir ../app/src/typechain ./artifacts/contracts/cashSide.sol/CashSide.json && copyfiles --flat -V ./artifacts/contracts/cashSide.sol/CashSide.json ../app/src/typechain"
+  },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.4",
     "@nomiclabs/hardhat-etherscan": "^2.1.8",
@@ -7,12 +10,14 @@
     "@openzeppelin/contracts": "^4.4.2",
     "@typechain/ethers-v5": "^7.2.0",
     "@typechain/hardhat": "^2.3.1",
+    "@typechain/web3-v1": "^5.0.0",
     "@types/chai": "^4.3.0",
     "@types/mocha": "^9.1.0",
     "@types/node": "^12.20.42",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
     "chai": "^4.3.4",
+    "copyfiles": "^2.4.1",
     "dotenv": "^10.0.0",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",

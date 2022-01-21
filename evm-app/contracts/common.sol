@@ -43,7 +43,7 @@ abstract contract  Common is Ownable{
         
     }
 
-    mapping (bytes32 => LockedLoan) public contracts;
+    mapping (bytes32 => LockedLoan) internal contracts;
 
     uint8 constant state_created =0;
     uint8 constant state_bobFunded =1;
@@ -94,12 +94,13 @@ abstract contract  Common is Ownable{
         exists = (contracts[_contractId].alexWallet != address(0));
     }
 
+    //Contract Structure is too big we need to split in two
     /**
      * @dev Get contract details.
      * @param _contractId HTLC contract id
      *
      */
-    function getContract(bytes32 _contractId)
+    function getContract1(bytes32 _contractId)
         public
         view
         returns (
@@ -121,8 +122,49 @@ abstract contract  Common is Ownable{
         address bobsWalet,
         address alexWallet,
         
-        uint8 status,
+        uint8 status
         
+        
+        )
+    {
+        if (haveContract(_contractId) == false)
+            return (
+                0,0, 
+                0,0, 
+                address(0), 0, 
+                
+                0,0,0,
+                
+                address(0), address(0),  
+                
+                0);
+
+        LockedLoan storage c = contracts[_contractId];
+        return (
+            c.secret1Hash,
+            c.secret2Hash,
+            c.preimage1,
+            c.preimage2,
+            c.assetContract,
+            c.tokenId,
+            c.loanAmount, 
+            c.loanInterest,
+            c.lenderDeposit,
+            c.bobsWallet,
+            c.alexWallet,
+            c.status
+        );
+    }
+
+    /**
+     * @dev Get contract details.
+     * @param _contractId HTLC contract id
+     *
+     */
+    function getContract2(bytes32 _contractId)
+        public
+        view
+        returns (
         //Alex's Loan request is good till this timestamp. Bob has to deposit funds before this time
         uint256 reqTill,
 
@@ -138,38 +180,16 @@ abstract contract  Common is Ownable{
     {
         if (haveContract(_contractId) == false)
             return (
-                0,0, 
-                0,0, 
-                address(0), 0, 
-                
-                0,0,0,
-                
-                address(0), address(0),  
-                
-                0,  
-                
                 0, 0, 0, 0);
 
         LockedLoan storage c = contracts[_contractId];
         return (
-            c.secret1Hash,
-            c.secret2Hash,
-            c.preimage1,
-            c.preimage2,
-            c.assetContract,
-            c.tokenId,
-            c.loanAmount, 
-            c.loanInterest,
-            c.lenderDeposit,
-            c.bobsWallet,
-            c.alexWallet,
-            c.status,
-            
             c.reqTill,
             c.acceptTill,
             c.lockedTill,
             c.releaseTill
         );
     }
+
 
 }
