@@ -5,11 +5,36 @@ import { Spinner } from "react-bootstrap";
 import { ChainInfo, Injectedweb3, ConnectCtx } from './injected';
 import constate from 'constate';
 
-//the default chain needs to be the first One
-const supportedChains: ChainInfo[] = [
-    { chainId: '56', name: 'Binance Smart Chain', hexChainId: '0x38', rpcProvider: 'https://bsc-dataseed.binance.org/' },
-    { chainId: '97', name: 'bsc Testnet', hexChainId: '0x61', rpcProvider: 'https://data-seed-prebsc-1-s1.binance.org:8545/' }
-];
+//using generic project ID if we don't use our owne
+const _infuraKey = process.env.REACT_APP_INFURA_KEY||'9aa3d95b3bc440fa88ea12eaa4456161';
+
+console.log(`_infuraKey = ${_infuraKey}`);
+
+type ContractDetails ={
+    chain:ChainInfo;
+    address:string;
+    testFaucet?:string;
+}
+
+type ContractInfo ={
+    assetSide:ContractDetails;
+    cashSide:ContractDetails;
+};
+
+const _chains:{[network:string]:ContractInfo} ={
+    testnet:{
+        assetSide:{
+            chain:{ chainId: '4', name: 'Rinkeby', hexChainId: '0x4', rpcProvider: `https://rinkeby.infura.io/v3/${_infuraKey}` },
+            address: '0x9Cf54a62110d212cDFD53bde174ba52C79B6Bb47',
+            testFaucet: '0x7175efCb96b1ff044f4AC22A5579d572b41C3784'
+        },
+        cashSide:{
+            chain:{ chainId: '421611', name: 'Arbitrum Testnet', hexChainId: '0x66EEB', rpcProvider: 'https://rinkeby.arbitrum.io/rpc' },
+            address: '0x4f3b397423a83f7db2fDbe7a98fD34f0EA2c748a'
+        }
+    }
+}
+
 
 export const [Web3Provider,
     useweb3Context, useConnectCalls] = constate(
@@ -90,6 +115,7 @@ export function ConnectWallet() {
         const usingTestnet = qParams['network'] == 'test';
         console.log(`usingTestnet = ${usingTestnet}`);
 
+        /*
         const chainInfo = supportedChains[usingTestnet ? 1 : 0];
 
         (async () => {
@@ -102,6 +128,7 @@ export function ConnectWallet() {
             }
 
         })();
+        */
 
     }, []);
 

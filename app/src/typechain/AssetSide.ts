@@ -37,6 +37,7 @@ export type OwnershipTransferred = ContractEventLog<{
   0: string;
   1: string;
 }>;
+export type Received = ContractEventLog<{}>;
 
 export interface AssetSide extends BaseContract {
   constructor(
@@ -61,6 +62,12 @@ export interface AssetSide extends BaseContract {
       _lockedTill: number | string | BN,
       _releaseTill: number | string | BN
     ): NonPayableTransactionObject<void>;
+
+    computeContractId(
+      _alexWallet: string,
+      _asset: string,
+      _tokenId: number | string | BN
+    ): NonPayableTransactionObject<string>;
 
     getContract1(_contractId: string | number[]): NonPayableTransactionObject<{
       secret1Hash: string;
@@ -112,6 +119,13 @@ export interface AssetSide extends BaseContract {
 
     noTakersForLoan(): NonPayableTransactionObject<void>;
 
+    onERC721Received(
+      _operator: string,
+      _from: string,
+      _tokenId: number | string | BN,
+      _data: string | number[]
+    ): NonPayableTransactionObject<string>;
+
     owner(): NonPayableTransactionObject<string>;
 
     releaseCollatoral(
@@ -136,6 +150,9 @@ export interface AssetSide extends BaseContract {
       cb?: Callback<OwnershipTransferred>
     ): EventEmitter;
 
+    Received(cb?: Callback<Received>): EventEmitter;
+    Received(options?: EventOptions, cb?: Callback<Received>): EventEmitter;
+
     allEvents(options?: EventOptions, cb?: Callback<EventLog>): EventEmitter;
   };
 
@@ -152,4 +169,7 @@ export interface AssetSide extends BaseContract {
     options: EventOptions,
     cb: Callback<OwnershipTransferred>
   ): void;
+
+  once(event: "Received", cb: Callback<Received>): void;
+  once(event: "Received", options: EventOptions, cb: Callback<Received>): void;
 }

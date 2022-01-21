@@ -60,6 +60,11 @@ abstract contract  Common is Ownable{
         _;
     }
 
+    function computeContractId(address _alexWallet, address _asset, uint256 _tokenId) public pure returns (bytes32)
+    {
+        return _computeContractId(_alexWallet, _asset, _tokenId);
+    }
+
     //the contract Id is calculated by packing these parameters together
     //Alex cannot create 2 loans for the same token
     function _computeContractId(address _alexWallet, address _asset, uint256 _tokenId) internal pure returns (bytes32)

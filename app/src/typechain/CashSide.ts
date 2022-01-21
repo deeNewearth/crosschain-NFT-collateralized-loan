@@ -57,6 +57,12 @@ export interface CashSide extends BaseContract {
       _releaseTill: number | string | BN
     ): NonPayableTransactionObject<void>;
 
+    computeContractId(
+      _alexWallet: string,
+      _asset: string,
+      _tokenId: number | string | BN
+    ): NonPayableTransactionObject<string>;
+
     getContract1(_contractId: string | number[]): NonPayableTransactionObject<{
       secret1Hash: string;
       secret2Hash: string;

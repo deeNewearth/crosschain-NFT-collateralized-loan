@@ -3,11 +3,12 @@ pragma solidity ^0.8.0;
 
 import "./common.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 
 //Alex wants to borrow  1 ETH on Arbitum against  CLBX-1123 on ETH network 
 //This contract is deployed on ETH 
 
-contract AssetSide is Common{
+contract AssetSide is Common, IERC721Receiver {
 
     //STEP 1 -Called by Alex - Alex creates a loan record with Secret 1
     //Requires AlexToBe to be the owner, approved, or operator
@@ -73,6 +74,21 @@ contract AssetSide is Common{
         bytes32 contractId
     );
 
+    function onERC721Received(
+        address _operator,
+        address _from,
+        uint256 _tokenId,
+        bytes calldata _data
+    ) external override returns (bytes4){
+        _operator;
+        _from;
+        _tokenId;
+        _data;
+        emit Received();
+        return this.onERC721Received.selector;
+    }
+
+    event Received();
     
     function noTakersForLoan(/*bytes32 _contractId*/) external pure {
         //LockedLoan storage c = contracts[_contractId];
