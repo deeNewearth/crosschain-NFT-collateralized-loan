@@ -13,7 +13,10 @@ let faucet: AssetFaucet;
 
 let contractId: BytesLike;
 
-describe("Cross-layer loan with NFT collateral", function () {
+const preImage1 = ethers.utils.sha256(ethers.utils.toUtf8Bytes("SECRET1"));
+const preImage2 = ethers.utils.sha256(ethers.utils.toUtf8Bytes("SECRET2"));
+
+describe("Cross-layer loan with NFT collateral", async function () {
   it("all contracts should deploy", async function () {
     const _assetfactory = await ethers.getContractFactory("AssetSide");
     assetSide = await _assetfactory.deploy();
@@ -38,7 +41,6 @@ describe("Cross-layer loan with NFT collateral", function () {
     const tx2 = await faucet.connect(alex).approve(assetSide.address, 1);
     await tx2.wait();
 
-    const preImage1 = ethers.utils.sha256(ethers.utils.toUtf8Bytes("secret1"));
     const secret1Hash = generateSecretHash(preImage1);
 
     const currentTimeInSec = Math.round(new Date().getTime() / 1000);
@@ -102,7 +104,6 @@ describe("Cross-layer loan with NFT collateral", function () {
   it("STEP II: Bob accepts the loan", async () => {
     const [_deployer, _alice, bob] = await ethers.getSigners();
 
-    const preImage2 = ethers.utils.sha256(ethers.utils.toUtf8Bytes("SECRET2"));
     const secret2Hash = generateSecretHash(preImage2);
 
     /* Bob cannot disburse the incorrect amount */
@@ -127,8 +128,41 @@ describe("Cross-layer loan with NFT collateral", function () {
     const tx2 = await assetSide.connect(bob).giveLoan(contractId, secret2Hash);
     await tx2.wait();
 
-    const contract_assetSide = await cashSide.getContract1(contractId);
+    const contract_assetSide = await assetSide.getContract1(contractId);
     expect(contract_assetSide.bobsWalet).to.equal(bob.address);
+  });
+
+  it("STEP III: Alice collects the loaned funds", async () => {
+    const [_deployer, alex, bob] = await ethers.getSigners();
+
+    /* Accepting loan with wrong secret fails */
+    await expect(
+      cashSide.connect(alex).acceptLoan(contractId, preImage2)
+    ).to.be.revertedWith("hashlock hash does not match");
+
+    const contractBalanceBefore = await ethers.provider.getBalance(
+      cashSide.address
+    );
+
+    const tx1 = await cashSide.connect(alex).acceptLoan(contractId, preImage1);
+    await tx1.wait();
+
+    const contractBalanceAfter = await ethers.provider.getBalance(
+      cashSide.address
+    );
+    const contract_cashSide = await cashSide.getContract1(contractId);
+    expect(contractBalanceAfter).to.equal(contract_cashSide.lenderDeposit);
+    expect(contractBalanceAfter).to.equal(
+      contractBalanceBefore.sub(contract_cashSide.loanAmount)
+    );
+
+    /* TODO: check Alex's balance accounting for gas costs */
+
+    const tx2 = await assetSide.connect(bob).acceptLoan(contractId, preImage1);
+    await tx2.wait();
+
+    const contract_assetSide = await assetSide.getContract1(contractId);
+    expect(contract_assetSide.preimage1).to.equal(preImage1);
   });
 
   const generateSecretHash = (secret: String) => {
