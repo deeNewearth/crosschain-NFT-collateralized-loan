@@ -98,7 +98,7 @@ describe("Cross-layer loan with NFT collateral", function () {
   describe("SCENARIO I: Alex & Bob walk the happy path", () => {
     loadBeforeAndAfter();
     it("STEP II: Bob accepts the loan", async () => {
-      const [_deployer, _alice, bob] = await ethers.getSigners();
+      const [_deployer, _alex, bob] = await ethers.getSigners();
 
       const secret2Hash = generateSecretHash(preImage2);
 
@@ -132,7 +132,7 @@ describe("Cross-layer loan with NFT collateral", function () {
       expect(contract_assetSide.bobsWalet).to.equal(bob.address);
     });
 
-    it("STEP III: Alice collects the loaned funds", async () => {
+    it("STEP III: Alex collects the loaned funds", async () => {
       const [_deployer, alex, bob] = await ethers.getSigners();
 
       /* Accepting loan with wrong secret fails */
@@ -169,7 +169,7 @@ describe("Cross-layer loan with NFT collateral", function () {
       expect(contract_assetSide.preimage1).to.equal(preImage1);
     });
 
-    it("STEP IV: Alice repays the loan", async () => {
+    it("STEP IV: Alex repays the loan", async () => {
       /* TODO*/
     });
   });
@@ -195,6 +195,8 @@ describe("Cross-layer loan with NFT collateral", function () {
       expect(await faucet.ownerOf(1)).to.be.eq(alex.address);
     });
   });
+
+  describe("SCENARIO III: Bob does not");
 
   /* HELPER FUNCTIONS */
 
