@@ -33,6 +33,8 @@ describe("LoanWorks", function () {
 
         expect( await faucet.ownerOf(1)).to.be.eq(alex.address);
 
+        
+
         const tx2 = await faucet.connect(alex).approve(assetSide.address,1);
         await tx2.wait();
 

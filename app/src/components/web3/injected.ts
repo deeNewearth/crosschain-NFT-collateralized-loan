@@ -17,7 +17,6 @@ export type ConnectCtx ={
 export class Injectedweb3 {
 
     readonly injected: any = undefined;
-   
 
     constructor() {
 

@@ -100,9 +100,20 @@ export interface AssetFaucet extends BaseContract {
 
     symbol(): NonPayableTransactionObject<string>;
 
+    tokenByIndex(
+      index: number | string | BN
+    ): NonPayableTransactionObject<string>;
+
+    tokenOfOwnerByIndex(
+      owner: string,
+      index: number | string | BN
+    ): NonPayableTransactionObject<string>;
+
     tokenURI(
       tokenId: number | string | BN
     ): NonPayableTransactionObject<string>;
+
+    totalSupply(): NonPayableTransactionObject<string>;
 
     transferFrom(
       from: string,

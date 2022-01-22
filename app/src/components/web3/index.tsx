@@ -22,11 +22,11 @@ type ContractInfo ={
 };
 
 const _chains:{[network:string]:ContractInfo} ={
-    testnet:{
+    'testnet':{
         assetSide:{
             chain:{ chainId: '4', name: 'Rinkeby', hexChainId: '0x4', rpcProvider: `https://rinkeby.infura.io/v3/${_infuraKey}` },
             address: '0x9Cf54a62110d212cDFD53bde174ba52C79B6Bb47',
-            testFaucet: '0x7175efCb96b1ff044f4AC22A5579d572b41C3784'
+            testFaucet: '0x361cf804bF937638d9C9d24F22B1E7BFC3650Bf7'
         },
         cashSide:{
             chain:{ chainId: '421611', name: 'Arbitrum Testnet', hexChainId: '0x66EEB', rpcProvider: 'https://rinkeby.arbitrum.io/rpc' },
@@ -37,22 +37,25 @@ const _chains:{[network:string]:ContractInfo} ={
 
 
 export const [Web3Provider,
-    useweb3Context, useConnectCalls] = constate(
+    /*useweb3Context,*/ useConnectCalls] = constate(
         useWeb3,
-        v => v.ctx,
+        //v => v.ctx,
         v => v.connector
     );
 
 function useWeb3() {
-    const [ctx, setCtx] = useState<ConnectCtx & { chainInfo: ChainInfo, reconnecting?:boolean }>();
+    //const [ctx, setCtx] = useState<ConnectCtx & { chainInfo: ChainInfo, reconnecting?:boolean }>();
+    ///we will read this OFF query params when mainNet is implemented
+    const contractDetails = _chains['testnet'];
 
     const connect = async (chainInfo: ChainInfo) => {
         const injected = new Injectedweb3();
         const r = await injected.connect(chainInfo);
-        setCtx({ ...r, chainInfo });
+        //setCtx({ ...r, chainInfo });
         return r;
     }
 
+    /*
     const disconnect = async () => {
         if (!ctx?.chainInfo)
             return;
@@ -71,13 +74,15 @@ function useWeb3() {
         }
 
     }
+    */
 
     const connector = useMemo(() => ({
         connect,
-        disconnect
-    }), [ctx]);
+        contractDetails
+        //disconnect
+    }), [contractDetails]);
 
-    return { ctx, connector };
+    return { /*ctx,*/ connector };
 }
 
 
@@ -85,7 +90,7 @@ export function ConnectWallet() {
 
     const qParams = useQueryParams();
     const { connect } = useConnectCalls();
-    const liftedCtx = useweb3Context();
+    //const liftedCtx = useweb3Context();
 
 
     const [web3ctx, setWeb3Ctx] = useState<IAsyncResult<{
@@ -95,10 +100,12 @@ export function ConnectWallet() {
     useEffect(() => {
         console.log('connecting wallet');
 
+        /*
         if(liftedCtx?.reconnecting){
             console.log('wallet is reconnecting exit');
             return;
         }
+        */
 
         let injected: any = undefined;
 
@@ -132,12 +139,14 @@ export function ConnectWallet() {
 
     }, []);
 
+    /*
     if (!!web3ctx.isLoading || liftedCtx?.reconnecting) {
         return <div className="p-3 d-flex ">
             <Spinner animation="border" variant="primary" />
             <span className="m-1">Waiting for wallet</span>
         </div>;
     }
+    */
 
     if (!!web3ctx?.error) {
         return <ShowError error={web3ctx?.error} />
