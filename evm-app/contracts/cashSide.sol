@@ -92,5 +92,28 @@ contract CashSide is Common {
 
     }
 
+        /**
+     * @dev STEP3:  -Called by Alex - Bob has funded the Loan and Alex is accepting the loan
+                    Only Alex knows secret1 so we don't care who the message sender etc is
+                    Alex Should NOT call this method before she has ensured that she has access to Loan Funds
+     *
+     * @param _contractId Id of the Load.
+     * @param _preImage1 sha256(_preimage) should equal the contract hashlock.
+     */
+    function acceptLoan(bytes32 _contractId, bytes32 _preImage1)
+        external
+        contractExists(_contractId)
+    {
+        LockedLoan storage c = contracts[_contractId];
+        require(c.status == state_bobFunded,"must be state_bobFunded");
+        ensureHashlockMatches(c.secret1Hash,_preImage1);
+
+        c.preimage1 = _preImage1;
+        c.status = state_movedToEscrow;
+
+        payable(c.alexWallet).transfer(c.loanAmount);
+    }
+
+
 
 }
