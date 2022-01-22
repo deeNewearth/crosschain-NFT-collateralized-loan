@@ -76,10 +76,17 @@ describe("UNHAPPY PATHS", function () {
       ).to.be.revertedWith("acceptTill not yet passed");
     });
 
-    it("Step III: Bob can recover funds after `acceptTill`", async () => {
-      const [_deployer, _alex, bob] = await ethers.getSigners();
+    it("Step III: Alex cannot withdraw funds after `acceptTill`", async () => {
+      const [_deployer, alex, _bob] = await ethers.getSigners();
       await hre.ethers.provider.send("evm_increaseTime", [48 * 60 * 60]);
 
+      await expect(
+        cashSide.connect(alex).acceptLoan(contractId, preImage1)
+      ).to.be.revertedWith("acceptTill has passed");
+    });
+
+    it("Step III: Bob can recover funds after `acceptTill`", async () => {
+      const [_deployer, _alex, bob] = await ethers.getSigners();
       const bobInitialBalance = await ethers.provider.getBalance(bob.address);
 
       expect(await ethers.provider.getBalance(cashSide.address)).to.equal(

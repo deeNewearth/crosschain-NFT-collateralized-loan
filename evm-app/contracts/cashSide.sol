@@ -105,6 +105,7 @@ contract CashSide is Common {
     {
         LockedLoan storage c = contracts[_contractId];
         require(c.status == state_bobFunded,"must be state_bobFunded");
+        require(c.acceptTill > block.timestamp, "acceptTill has passed");
         ensureHashlockMatches(c.secret1Hash,_preImage1);
 
         c.preimage1 = _preImage1;
