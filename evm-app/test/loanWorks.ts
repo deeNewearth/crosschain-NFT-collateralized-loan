@@ -16,7 +16,7 @@ let contractId: BytesLike;
 const preImage1 = ethers.utils.sha256(ethers.utils.toUtf8Bytes("SECRET1"));
 const preImage2 = ethers.utils.sha256(ethers.utils.toUtf8Bytes("SECRET2"));
 
-describe("Cross-layer loan with NFT collateral", function () {
+describe("HAPPY PATH", function () {
   describe("SETUP", () => {
     it("all contracts should deploy", async function () {
       const _assetfactory = await ethers.getContractFactory("AssetSide");
@@ -173,30 +173,6 @@ describe("Cross-layer loan with NFT collateral", function () {
       /* TODO*/
     });
   });
-
-  describe("SCENARIO II: Bob does not deposit the funds after Alex locks her NFT", async () => {
-    loadBeforeAndAfter();
-
-    it("Step II: Alex cannot reclaim NFT before `reqTill`", async () => {
-      const [deployer, alex, bob] = await ethers.getSigners();
-
-      await expect(
-        assetSide.connect(alex).noTakersForLoan(contractId)
-      ).to.be.revertedWith("reqTill not yet passed");
-    });
-
-    it("Step II: Alex can reclaim NFT after `reqTill`", async () => {
-      const [deployer, alex, bob] = await ethers.getSigners();
-
-      await hre.ethers.provider.send("evm_increaseTime", [24 * 60 * 60]);
-      const tx1 = await assetSide.connect(alex).noTakersForLoan(contractId);
-      await tx1.wait();
-
-      expect(await faucet.ownerOf(1)).to.be.eq(alex.address);
-    });
-  });
-
-  describe("SCENARIO III: Bob does not");
 
   /* HELPER FUNCTIONS */
 
