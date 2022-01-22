@@ -1,6 +1,8 @@
 {
   "name": "hardhat-project",
   "scripts": {
+    "compile": "npx hardhat compile",
+    "test": "npx hardhat test",
     "generateTypes": "typechain --target=web3-v1  --out-dir ../app/src/typechain ./artifacts/contracts/assetSide.sol/AssetSide.json && copyfiles --flat -V ./artifacts/contracts/assetSide.sol/AssetSide.json ../app/src/typechain && typechain --target=web3-v1  --out-dir ../app/src/typechain ./artifacts/contracts/cashSide.sol/CashSide.json && copyfiles --flat -V ./artifacts/contracts/cashSide.sol/CashSide.json ../app/src/typechain && typechain --target=web3-v1  --out-dir ../app/src/typechain ./artifacts/contracts/assetFaucet.sol/AssetFaucet.json && copyfiles --flat -V ./artifacts/contracts/assetFaucet.sol/AssetFaucet.json ../app/src/typechain"
   },
   "devDependencies": {
