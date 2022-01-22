@@ -1,6 +1,7 @@
 import './App.scss';
-import {HashRouter, Link, Routes, Route} from 'react-router-dom';
-import { Button, Nav, Navbar } from 'react-bootstrap';
+import { HashRouter, Link, Routes, Route } from 'react-router-dom';
+import { Button, Nav, Navbar,Container } from 'react-bootstrap';
+import {LinkContainer} from 'react-router-bootstrap';
 
 //import { ConnectWallet, Web3Provider, useweb3Context, useConnectCalls } from './components/web3';
 import { Web3Provider } from './components/web3';
@@ -11,31 +12,33 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 
 import FaucetView from './components/faucet';
-
+import {LoanRequestView} from './components/iBorrowed';
 
 function Topbar() {
-  /*const web3Ctx = useweb3Context();
-  //const { disconnect } = useConnectCalls();
 
-  if (!web3Ctx?.account)
-    return null;
-  */
-
-  return <div className='topBar d-flex flex-row justify-content-end pe-2 text-white-50 align-items-end'>
-    {/*<span className='me-2 chainName'>{web3Ctx.chainInfo.name}:</span>
-    <ShowAddress address={web3Ctx.account} />
-    <Button className="accountBtn" variant="link" onClick={async () => {
-      try {
-        await disconnect();
-      } catch (error: any) {
-        console.error(`failed to disconnect ${error}`);
-      }
-    }}>
-      <FontAwesomeIcon icon={faSignOutAlt} />
-    </Button>
-  */}
-  </div>;
+  return <Navbar collapseOnSelect expand="md" bg="dark" variant="dark">
+    <Container>
+      <LinkContainer to="/">
+        <Navbar.Brand >NFT loans</Navbar.Brand>
+      </LinkContainer>
+      <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+      <Navbar.Collapse id="responsive-navbar-nav">
+        <Nav className="me-auto">
+          <Nav.Link href="#features">Features</Nav.Link>
+          <Nav.Link href="#pricing">Pricing</Nav.Link>
+        </Nav>
+        <Nav>
+          <LinkContainer to="/faucet">
+            <Nav.Link >
+              test faucet
+            </Nav.Link>
+          </LinkContainer>
+        </Nav>
+      </Navbar.Collapse>
+    </Container>
+  </Navbar>;
 }
+
 
 function MainContent() {
 
@@ -48,12 +51,13 @@ function MainContent() {
   */
 
   return <Routes>
-    <Route path="/" element={<FaucetView/>}/>
+    <Route path="/" element={<LoanRequestView />} />
+    <Route path="/faucet" element={<FaucetView />} />
 
-    <Route path="*" element={<div>404 - nothing here</div>}/>
+    <Route path="*" element={<div>404 - nothing here</div>} />
 
   </Routes>;
-  
+
 }
 
 export default function () {
@@ -68,5 +72,5 @@ export default function () {
 
 
     </div>
-    </HashRouter></Web3Provider>;
+  </HashRouter></Web3Provider>;
 };

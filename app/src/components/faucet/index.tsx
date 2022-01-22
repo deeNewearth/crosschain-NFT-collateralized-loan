@@ -11,6 +11,9 @@ export default function FaucetView(){
     const [sumbitted,setSubmitted] = useState<IAsyncResult<string>>();
 
     return <Container className='text-center'>
+
+        <p>Faucet NFT address : {contractDetails.assetSide.testFaucet}</p>
+
         <Button size='lg' disabled={!!sumbitted?.isLoading} onClick={async ()=>{
             try{
                 setSubmitted({isLoading:true});
