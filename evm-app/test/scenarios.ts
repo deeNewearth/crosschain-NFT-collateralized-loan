@@ -39,7 +39,7 @@ describe("UNHAPPY PATHS", function () {
     });
   });
 
-  describe("SCENARIO III: Alice does not collect the funds deposited by Bob", async () => {
+  describe("SCENARIO III: Alex does not collect the funds deposited by Bob", async () => {
     loadBeforeAndAfter();
 
     it("STEP III: Bob cannot retrieve his funds before `acceptTill`", async () => {
