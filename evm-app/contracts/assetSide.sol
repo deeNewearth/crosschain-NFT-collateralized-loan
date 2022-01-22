@@ -20,10 +20,10 @@ contract AssetSide is Common, IERC721Receiver {
         bytes32 _secret1Hash,
 
 
-        uint256 _reqTill,
-        uint256 _acceptTill,
-        uint256 _lockedTill,
-        uint256 _releaseTill
+        uint256 _reqTill, /* Bob has to deposit before this time. He cannot deposit afterwards. */
+        uint256 _acceptTill, /* Alice has to withdraw funds before this time. She cannot deposit afterwards. */
+        uint256 _lockedTill, /* Loan expiration */
+        uint256 _releaseTill /* The time Bob has to reveal his secret if loan has been returned or trigger default */
     )
         external
         futureTimelock(_reqTill)
@@ -90,13 +90,16 @@ contract AssetSide is Common, IERC721Receiver {
 
     event Received();
     
-    function noTakersForLoan(/*bytes32 _contractId*/) external pure {
-        //LockedLoan storage c = contracts[_contractId];
-        //need to verify that the blockTime past _reqTill and state 
-        // and refund the asset
-        require(false,"todo: not implemented");
-        //require(_ms);
+    function noTakersForLoan(bytes32 _contractId) external {
+        LockedLoan storage c = contracts[_contractId];
+        require(c.status == state_created,"must be state_created");
+        require(c.reqTill < block.timestamp, "reqTill not yet passed");
 
+        ERC721(c.assetContract).safeTransferFrom(
+                address(this),
+                c.alexWallet,
+                c.tokenId
+        );
     }
 
     /**
