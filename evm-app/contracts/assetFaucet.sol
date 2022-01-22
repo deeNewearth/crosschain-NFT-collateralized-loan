@@ -14,10 +14,7 @@ contract AssetFaucet is ERC721Enumerable{
     Counters.Counter private _tokenIds;
 
     constructor() ERC721("CLRBX Faucet","CLRBX-f")
-    {
-        console.log("clrbx created");
-        //_setBaseURI("https://test.me");
-    }
+    {}
 
     function giveMe() 
     external
