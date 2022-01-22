@@ -82,12 +82,17 @@ contract CashSide is Common {
     );
 
 
-    //alex didn't take the loan the money needs to go back to bob
+    /**
+     * @dev Called by Bob in case Alex has not withdrawn the loan.
+     * @param _contractId ID of the loan.
+    */ 
     function noTakersForLoan(bytes32 _contractId) external {
         LockedLoan storage c = contracts[_contractId];
         require(c.status == state_bobFunded,"must be state_bobFunded");
         require(c.acceptTill < block.timestamp, "acceptTill not yet passed");
 
+        c.status = state_refundToBob;
+        
         payable(c.bobsWallet).transfer(c.loanAmount + c.lenderDeposit);
     }
 
