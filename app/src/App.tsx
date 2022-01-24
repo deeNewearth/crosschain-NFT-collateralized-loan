@@ -6,13 +6,13 @@ import {LinkContainer} from 'react-router-bootstrap';
 //import { ConnectWallet, Web3Provider, useweb3Context, useConnectCalls } from './components/web3';
 import { Web3Provider } from './components/web3';
 
-import { ShowAddress } from './components/utils/display';
+import { ShowCompacted } from './components/utils/display';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import LoanStatusView from './components/loanStatus';
+import LoanList from './components/loanStatus/list';
 
 import FaucetView from './components/faucet';
-import {LoanRequestView} from './components/iBorrowed';
+import {LoanRequestView} from './components/steps/newLoan';
 
 function Topbar() {
 
@@ -22,10 +22,11 @@ function Topbar() {
         <Navbar.Brand >NFT loans</Navbar.Brand>
       </LinkContainer>
       <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+
       <Navbar.Collapse id="responsive-navbar-nav">
         <Nav className="me-auto">
-          <Nav.Link href="#features">Features</Nav.Link>
-          <Nav.Link href="#pricing">Pricing</Nav.Link>
+          <Nav.Link href="#">Features</Nav.Link>
+          <Nav.Link href="#">Pricing</Nav.Link>
         </Nav>
         <Nav>
           <LinkContainer to="/faucet">
@@ -51,8 +52,10 @@ function MainContent() {
   */
 
   return <Routes>
-    <Route path="/" element={<LoanRequestView />} />
+    <Route path="/" element={<LoanList />} />
     <Route path="/faucet" element={<FaucetView />} />
+    <Route path="/status/:contractId" element={<LoanStatusView />} />
+    <Route path="/new" element={<LoanRequestView />} />
 
     <Route path="*" element={<div>404 - nothing here</div>} />
 

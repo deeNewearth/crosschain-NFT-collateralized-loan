@@ -1,5 +1,10 @@
 import Web3 from "web3";
 
+//NOT sure whe there need to be require and cannot be imported
+const ethUtil = require('ethereumjs-util');
+const sigUtil = require('eth-sig-util')
+
+
 export type ChainInfo = {
     chainId: string;
     name: string;
@@ -7,11 +12,79 @@ export type ChainInfo = {
     rpcProvider: string;
 }
 
-export type ConnectCtx ={
-    web3:Web3;
-    account:string;
-}
 
+export class ConnectCtx{
+    readonly web3:Web3;
+    readonly account:string;
+
+    constructor(web3:Web3, account:string){
+        this.web3 = web3;
+        this.account = account;
+    }
+
+    dataDecrypter = async (encryptedMessage: string) => {
+        try {
+
+            const provider: any = this.web3.currentProvider;    
+
+            const dectpted: string = await provider.request({
+                method: "eth_decrypt",
+                params: [encryptedMessage, this.account]
+            });
+
+            return dectpted;
+
+        } catch (err: any) {
+            throw new Error(`You provide doesn't support encryption. please try metamask: ${err}`);
+        }
+    }
+
+    dataEncrypt = async (plainText:string) => {
+        try {
+            
+            const provider: any = this.web3.currentProvider;
+            
+            const encryptionPublicKey = await provider.request({
+                method: "eth_getEncryptionPublicKey",
+                params: [this.account]
+            });
+    
+            
+            const k = sigUtil.encrypt(
+                encryptionPublicKey,
+                { data: plainText },
+                'x25519-xsalsa20-poly1305'
+            );
+    
+    
+            const encryptedMessage: string = ethUtil.bufferToHex(
+                Buffer.from(
+                    JSON.stringify(k),
+                    'utf8'
+                )
+            );
+    
+            return encryptedMessage;
+    
+        } catch (err: any) {
+            
+            throw new Error(`Your provider doesn't support encryption. please try metamask: ${err}`);
+        }
+    }
+
+    evmPackedSecret = (secret:string) =>{
+        return this.web3.utils.sha3(secret)||'';
+    }
+
+    evmSecrethash =(secret: string) =>{
+        
+        const preImage = this.evmPackedSecret(secret);
+        const encoded = this.web3.eth.abi.encodeParameters(['bytes32'], [preImage]);
+        return this.web3.utils.keccak256(encoded)
+    
+    }
+    
+}
 
 
 export class Injectedweb3 {
@@ -46,7 +119,7 @@ export class Injectedweb3 {
 
         console.log(`injected : provider connected :${accounts[0]}`);
 
-        return {web3: new Web3(this.injected), account:accounts[0]} as ConnectCtx;
+        return new ConnectCtx(new Web3(this.injected), accounts[0]);
     };
 
     private ensureCorrectChain = async (chainInfo: ChainInfo) => {

@@ -21,6 +21,16 @@ export interface EventOptions {
   topics?: string[];
 }
 
+export type LoanGiven = ContractEventLog<{
+  bobsWallet: string;
+  asset: string;
+  status: string;
+  contractId: string;
+  0: string;
+  1: string;
+  2: string;
+  3: string;
+}>;
 export type LoanRequest = ContractEventLog<{
   alexWallet: string;
   asset: string;
@@ -57,10 +67,8 @@ export interface AssetSide extends BaseContract {
       _tokenId: number | string | BN,
       _assetOwner: string,
       _secret1Hash: string | number[],
-      _reqTill: number | string | BN,
-      _acceptTill: number | string | BN,
-      _lockedTill: number | string | BN,
-      _releaseTill: number | string | BN
+      _secret1Encrypted: string,
+      _lockedTill: number | string | BN
     ): NonPayableTransactionObject<void>;
 
     computeContractId(
@@ -70,10 +78,6 @@ export interface AssetSide extends BaseContract {
     ): NonPayableTransactionObject<string>;
 
     getContract1(_contractId: string | number[]): NonPayableTransactionObject<{
-      secret1Hash: string;
-      secret2Hash: string;
-      preimage1: string;
-      preimage2: string;
       assetContract: string;
       tokenId: string;
       loanAmount: string;
@@ -90,13 +94,13 @@ export interface AssetSide extends BaseContract {
       5: string;
       6: string;
       7: string;
-      8: string;
-      9: string;
-      10: string;
-      11: string;
     }>;
 
     getContract2(_contractId: string | number[]): NonPayableTransactionObject<{
+      secret1Hash: string;
+      secret2Hash: string;
+      preimage1: string;
+      preimage2: string;
       reqTill: string;
       acceptTill: string;
       lockedTill: string;
@@ -105,11 +109,16 @@ export interface AssetSide extends BaseContract {
       1: string;
       2: string;
       3: string;
+      4: string;
+      5: string;
+      6: string;
+      7: string;
     }>;
 
     giveLoan(
       _contractId: string | number[],
-      _secret2Hash: string | number[]
+      _secret2Hash: string | number[],
+      _secret2Encrypted: string
     ): NonPayableTransactionObject<void>;
 
     loanDefault(
@@ -138,6 +147,9 @@ export interface AssetSide extends BaseContract {
     transferOwnership(newOwner: string): NonPayableTransactionObject<void>;
   };
   events: {
+    LoanGiven(cb?: Callback<LoanGiven>): EventEmitter;
+    LoanGiven(options?: EventOptions, cb?: Callback<LoanGiven>): EventEmitter;
+
     LoanRequest(cb?: Callback<LoanRequest>): EventEmitter;
     LoanRequest(
       options?: EventOptions,
@@ -155,6 +167,13 @@ export interface AssetSide extends BaseContract {
 
     allEvents(options?: EventOptions, cb?: Callback<EventLog>): EventEmitter;
   };
+
+  once(event: "LoanGiven", cb: Callback<LoanGiven>): void;
+  once(
+    event: "LoanGiven",
+    options: EventOptions,
+    cb: Callback<LoanGiven>
+  ): void;
 
   once(event: "LoanRequest", cb: Callback<LoanRequest>): void;
   once(

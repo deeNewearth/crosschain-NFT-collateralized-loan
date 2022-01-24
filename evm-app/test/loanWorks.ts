@@ -53,8 +53,8 @@ describe("LoanWorks", function () {
 
         const tx3 = await assetSide.connect(alex).askForLoan(
             faucet.address,1,
-            alex.address,secret1Hash,
-            tomorrow,afterTomorrow,loanEnds,releaseEnd);
+            alex.address,secret1Hash,"",
+            loanEnds);
         await tx3.wait();
 
         const contractId = await assetSide.computeContractId(alex.address,faucet.address,1);

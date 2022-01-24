@@ -18,26 +18,35 @@ contract AssetSide is Common, IERC721Receiver {
         address _assetOwner,// It is possibe for alex to not be the Oner and just the operator for this asset
 
         bytes32 _secret1Hash,
+        string memory _secret1Encrypted,
 
+        uint256 _lockedTill
 
+        /* we are running out of stack so need to reduce parameter count
         uint256 _reqTill,
         uint256 _acceptTill,
-        uint256 _lockedTill,
         uint256 _releaseTill
+        */
     )
         external
-        futureTimelock(_reqTill)
-        futureTimelock(_acceptTill)
         futureTimelock(_lockedTill)
-        futureTimelock(_releaseTill)
     {
-
+        /*
+        uint256 _reqTill = block.timestamp + (3600 * 24) ;//1 day from now
+        uint256 _acceptTill = _reqTill + (3600 * 24) ;//1 day from reqTill
+        uint256 _releaseTill = _lockedTill+ (3600 * 24) ;//1 day from _lockedTill
+        */
+        
         bytes32 _contractId = _computeContractId(_msgSender(), _asset, _tokenId);
+
+        (uint256 _reqTill,uint256 _acceptTill,uint256 _releaseTill)=_computeTimeLocks(_lockedTill);
 
         // Reject if a contract already exists with the same parameters. 
         if (haveContract(_contractId)) revert("Contract already exists");
 
         contracts[_contractId] = LockedLoan(
+            _secret1Encrypted, "",
+
             _secret1Hash, 0,
 
             0,0,
@@ -50,10 +59,12 @@ contract AssetSide is Common, IERC721Receiver {
 
             state_created, //status
 
+            
             _reqTill,
             _acceptTill,
             _lockedTill,
             _releaseTill
+            
         );
 
         // This contract becomes the temporary owner of the asset
@@ -103,8 +114,9 @@ contract AssetSide is Common, IERC721Receiver {
      * @dev STEP2: -Called by Bob - Bob funds the loan and the security deposit
      * @param _contractId Id of the Loan.
      * @param _secret2Hash A sha-2 sha256 hash for secret2 created by Bob.
+     * @param _secret2Encrypted A great place to store the encrypted secret as well
     */
-    function giveLoan(bytes32 _contractId, bytes32 _secret2Hash)
+    function giveLoan(bytes32 _contractId, bytes32 _secret2Hash, string memory _secret2Encrypted)
         external
         contractExists(_contractId)
     {
@@ -114,10 +126,20 @@ contract AssetSide is Common, IERC721Receiver {
         
 
         c.secret2Hash = _secret2Hash;
+        c.secret2encrypted = _secret2Encrypted;
         c.bobsWallet = _msgSender();
         c.status = state_bobFunded;
 
+        emit LoanGiven(c.bobsWallet,c.assetContract,c.status,_contractId);
+
     }
+
+    event LoanGiven(
+        address indexed bobsWallet,
+        address indexed asset,
+        uint256 indexed status,
+        bytes32 contractId
+    );
 
     
     /**

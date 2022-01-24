@@ -51,10 +51,7 @@ export interface CashSide extends BaseContract {
       _secret1Hash: string | number[],
       _loanAmount: number | string | BN,
       _loanInterest: number | string | BN,
-      _reqTill: number | string | BN,
-      _acceptTill: number | string | BN,
-      _lockedTill: number | string | BN,
-      _releaseTill: number | string | BN
+      _lockedTill: number | string | BN
     ): NonPayableTransactionObject<void>;
 
     computeContractId(
@@ -64,10 +61,6 @@ export interface CashSide extends BaseContract {
     ): NonPayableTransactionObject<string>;
 
     getContract1(_contractId: string | number[]): NonPayableTransactionObject<{
-      secret1Hash: string;
-      secret2Hash: string;
-      preimage1: string;
-      preimage2: string;
       assetContract: string;
       tokenId: string;
       loanAmount: string;
@@ -84,13 +77,13 @@ export interface CashSide extends BaseContract {
       5: string;
       6: string;
       7: string;
-      8: string;
-      9: string;
-      10: string;
-      11: string;
     }>;
 
     getContract2(_contractId: string | number[]): NonPayableTransactionObject<{
+      secret1Hash: string;
+      secret2Hash: string;
+      preimage1: string;
+      preimage2: string;
       reqTill: string;
       acceptTill: string;
       lockedTill: string;
@@ -99,6 +92,10 @@ export interface CashSide extends BaseContract {
       1: string;
       2: string;
       3: string;
+      4: string;
+      5: string;
+      6: string;
+      7: string;
     }>;
 
     giveLoan(

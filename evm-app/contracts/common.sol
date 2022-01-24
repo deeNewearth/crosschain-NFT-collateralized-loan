@@ -10,6 +10,11 @@ abstract contract  Common is Ownable{
     
 
     struct LockedLoan {
+        // we store the encrypted secrets  here as well
+        string secret1encrypted;
+        string secret2encrypted;
+
+
         bytes32 secret1Hash;
         bytes32 secret2Hash;
         
@@ -87,6 +92,19 @@ abstract contract  Common is Ownable{
         );
     }
 
+    function _computeTimeLocks(uint256 _lockedTill) internal view returns(
+        uint256 reqTill,
+        uint256 acceptTill,
+        uint256 releaseTill
+  
+    ) {
+        uint256 _reqTill = block.timestamp + (3600 * 24) ;//1 day from now
+        uint256 _acceptTill = _reqTill + (3600 * 24) ;//1 day from reqTill
+        uint256 _releaseTill = _lockedTill+ (3600 * 24) ;//1 day from _lockedTill
+
+        return(_reqTill,_acceptTill,_releaseTill);
+    }
+
     /**
      * @dev Is there a contract with id _contractId.
      * @param _contractId Id into contracts mapping.
@@ -109,11 +127,8 @@ abstract contract  Common is Ownable{
         public
         view
         returns (
-        bytes32 secret1Hash,
-        bytes32 secret2Hash,
-        
-        bytes32 preimage1, //revealed secret1
-        bytes32 preimage2, //revealed secret2
+        //string memory secret1encrypted,
+        //string memory secret2encrypted,
 
         //address  and tokenId of the ERC721 asset
         address assetContract,
@@ -134,8 +149,8 @@ abstract contract  Common is Ownable{
     {
         if (haveContract(_contractId) == false)
             return (
-                0,0, 
-                0,0, 
+          //      "","", 
+
                 address(0), 0, 
                 
                 0,0,0,
@@ -146,10 +161,8 @@ abstract contract  Common is Ownable{
 
         LockedLoan storage c = contracts[_contractId];
         return (
-            c.secret1Hash,
-            c.secret2Hash,
-            c.preimage1,
-            c.preimage2,
+            //c.secret1encrypted,            c.secret2encrypted,
+            
             c.assetContract,
             c.tokenId,
             c.loanAmount, 
@@ -170,6 +183,14 @@ abstract contract  Common is Ownable{
         public
         view
         returns (
+
+        bytes32 secret1Hash,
+        bytes32 secret2Hash,
+        
+        bytes32 preimage1, //revealed secret1
+        bytes32 preimage2, //revealed secret2
+
+
         //Alex's Loan request is good till this timestamp. Bob has to deposit funds before this time
         uint256 reqTill,
 
@@ -185,10 +206,17 @@ abstract contract  Common is Ownable{
     {
         if (haveContract(_contractId) == false)
             return (
+                0,0, 
+                0,0, 
                 0, 0, 0, 0);
 
         LockedLoan storage c = contracts[_contractId];
         return (
+            c.secret1Hash,
+            c.secret2Hash,
+            c.preimage1,
+            c.preimage2,
+
             c.reqTill,
             c.acceptTill,
             c.lockedTill,

@@ -1,0 +1,13 @@
+.loanList{
+    .loanTable{
+        width: 100%;
+        td{
+            width: 25%;
+            text-align: center;
+
+            .showCompact{
+                justify-content: center;
+            }
+        }
+    }
+}

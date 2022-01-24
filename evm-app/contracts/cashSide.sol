@@ -16,23 +16,23 @@ contract CashSide is Common {
         uint256 _loanAmount,
         uint256 _loanInterest,
 
-        uint256 _reqTill,
-        uint256 _acceptTill,
-        uint256 _lockedTill,
-        uint256 _releaseTill
+        uint256 _lockedTill
     )
         external
-        futureTimelock(_reqTill)
-        futureTimelock(_acceptTill)
         futureTimelock(_lockedTill)
-        futureTimelock(_releaseTill)
+        
     {
         require(_loanAmount > 0, "amount must be > 0");
+
+        (uint256 _reqTill,uint256 _acceptTill,uint256 _releaseTill)=_computeTimeLocks(_lockedTill);
+
 
         // Reject if a contract already exists with the same parameters. 
         if (haveContract(_contractId)) revert("Contract already exists");
 
         contracts[_contractId] = LockedLoan(
+            "","",
+
             _secret1Hash, 0,
 
             0,0,

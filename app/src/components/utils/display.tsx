@@ -1,15 +1,18 @@
 
 
 
-export function ShowAddress({address}:{address:string}){
+export function ShowCompacted({str}:{
+    type?:'address'
+    str:string
+}){
 
-    if(!address)
+    if(!str)
         return null;
 
-    const begin = address.substring(0,3);
-    const end = address.substring(address.length -4);
+    const begin = str.substring(0,3);
+    const end = str.substring(str.length -4);
 
-    return <div className="d-flex flex-row">
+    return <div className="d-flex flex-row showCompact">
         <span>{begin}...{end}</span>
 
     </div>;

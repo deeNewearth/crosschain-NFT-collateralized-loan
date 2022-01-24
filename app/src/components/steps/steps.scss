@@ -3,7 +3,13 @@
 @import "~bootstrap/scss/mixins";
 
 
-.chooseNFT{
+.newLoan{
+
+    form{
+        max-width: 50rem;
+    }
+
+
     .tokenId{
         max-width: 5rem;
 
@@ -16,5 +22,18 @@
     .verifyBtn{
         min-width: 7rem;
     }
+
+    .loanBtn{
+        min-width: 12rem;
+    }
     
+}
+
+.newLoanModal{
+    color: $gray-900;
+
+    .loanStatusView{
+        max-width: 20rem;
+        flex-grow: 1;
+    }
 }

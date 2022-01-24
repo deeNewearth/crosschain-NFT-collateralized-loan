@@ -4,8 +4,9 @@ import { useQueryParams, IAsyncResult, ShowError } from '../utils';
 import { Spinner } from "react-bootstrap";
 import { ChainInfo, Injectedweb3, ConnectCtx } from './injected';
 import constate from 'constate';
+import Web3 from "web3";
 
-//using generic project ID if we don't use our owne
+//using generic project ID if we don't use our own
 const _infuraKey = process.env.REACT_APP_INFURA_KEY||'9aa3d95b3bc440fa88ea12eaa4456161';
 
 console.log(`_infuraKey = ${_infuraKey}`);
@@ -25,12 +26,12 @@ const _chains:{[network:string]:ContractInfo} ={
     'testnet':{
         assetSide:{
             chain:{ chainId: '4', name: 'Rinkeby', hexChainId: '0x4', rpcProvider: `https://rinkeby.infura.io/v3/${_infuraKey}` },
-            address: '0x9Cf54a62110d212cDFD53bde174ba52C79B6Bb47',
+            address: '0x64Df5BE14e5a18c923b12A77992FfE7647549713',
             testFaucet: '0x361cf804bF937638d9C9d24F22B1E7BFC3650Bf7'
         },
         cashSide:{
             chain:{ chainId: '421611', name: 'Arbitrum Testnet', hexChainId: '0x66EEB', rpcProvider: 'https://rinkeby.arbitrum.io/rpc' },
-            address: '0x4f3b397423a83f7db2fDbe7a98fD34f0EA2c748a'
+            address: '0x9Cf54a62110d212cDFD53bde174ba52C79B6Bb47'
         }
     }
 }
@@ -53,6 +54,12 @@ function useWeb3() {
         const r = await injected.connect(chainInfo);
         //setCtx({ ...r, chainInfo });
         return r;
+    }
+
+    const readOnly = async (chainInfo: ChainInfo) => {
+        const web3ro = new Web3(chainInfo.rpcProvider);
+
+        return {web3ro};
     }
 
     /*
@@ -78,12 +85,16 @@ function useWeb3() {
 
     const connector = useMemo(() => ({
         connect,
+        readOnly,
         contractDetails
         //disconnect
     }), [contractDetails]);
 
     return { /*ctx,*/ connector };
 }
+
+
+
 
 
 export function ConnectWallet() {
