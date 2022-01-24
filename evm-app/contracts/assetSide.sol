@@ -101,13 +101,22 @@ contract AssetSide is Common, IERC721Receiver {
 
     event Received();
     
-    function noTakersForLoan(/*bytes32 _contractId*/) external pure {
-        //LockedLoan storage c = contracts[_contractId];
-        //need to verify that the blockTime past _reqTill and state 
-        // and refund the asset
-        require(false,"todo: not implemented");
-        //require(_ms);
+    /**
+     * @dev Called by Alex in case Bob has not funded the deposit.
+     * @param _contractId ID of the loan.
+    */
+    function noTakersForLoan(bytes32 _contractId) external {
+        LockedLoan storage c = contracts[_contractId];
+        require(c.status == state_created,"must be state_created");
+        require(c.reqTill < block.timestamp, "reqTill not yet passed");
 
+        c.status = state_refundToAlex;
+
+        ERC721(c.assetContract).safeTransferFrom(
+                address(this),
+                c.alexWallet,
+                c.tokenId
+        );
     }
 
     /**

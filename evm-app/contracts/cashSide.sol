@@ -82,15 +82,43 @@ contract CashSide is Common {
     );
 
 
-    //alex didn't take the loan the money needs to go back to bob
-    function noTakersForLoan(/*bytes32 _contractId*/) external pure {
-        //LockedLoan storage c = contracts[_contractId];
-        //need to verify that the blockTime past _reqTill and state 
-        // and refund the asset
-        require(false,"todo: not implemented");
-        //require(_ms);
+    /**
+     * @dev Called by Bob in case Alex has not withdrawn the loan.
+     * @param _contractId ID of the loan.
+    */ 
+    function noTakersForLoan(bytes32 _contractId) external {
+        LockedLoan storage c = contracts[_contractId];
+        require(c.status == state_bobFunded,"must be state_bobFunded");
+        require(c.acceptTill < block.timestamp, "acceptTill not yet passed");
 
+        c.status = state_refundToBob;
+        
+        payable(c.bobsWallet).transfer(c.loanAmount + c.lenderDeposit);
     }
+
+        /**
+     * @dev STEP3:  -Called by Alex - Bob has funded the Loan and Alex is accepting the loan
+                    Only Alex knows secret1 so we don't care who the message sender etc is
+                    Alex Should NOT call this method before she has ensured that she has access to Loan Funds
+     *
+     * @param _contractId Id of the Load.
+     * @param _preImage1 sha256(_preimage) should equal the contract hashlock.
+     */
+    function acceptLoan(bytes32 _contractId, bytes32 _preImage1)
+        external
+        contractExists(_contractId)
+    {
+        LockedLoan storage c = contracts[_contractId];
+        require(c.status == state_bobFunded,"must be state_bobFunded");
+        require(c.acceptTill > block.timestamp, "acceptTill has passed");
+        ensureHashlockMatches(c.secret1Hash,_preImage1);
+
+        c.preimage1 = _preImage1;
+        c.status = state_movedToEscrow;
+
+        payable(c.alexWallet).transfer(c.loanAmount);
+    }
+
 
 
 }
